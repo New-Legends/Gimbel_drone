@@ -1112,10 +1112,13 @@ public:
 
     //哨兵发送指令
     void send_sentry_cmd(uint8_t bit0);
-
     void leida_data_unpack(void);
-
     void determine_ID(void);
+
+    //用户函数
+    uint16_t* get_shoot_limit();
+    uint16_t* get_shoot_17mm_barrel_heat();
+    uint16_t* get_shoot_barrel_cooling_value();
 };
 
 #endif

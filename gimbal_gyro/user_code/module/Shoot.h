@@ -199,9 +199,9 @@ public:
   uint16_t shoot_limit;  
 
   // shoot枪口热量上限, shoot枪口实时热量
-  uint16_t shoot_cooling_limit;
-  uint16_t shoot_cooling_heat;
-  uint16_t shoot_cooling_rate;
+  uint16_t* shoot_cooling_limit;
+  uint16_t* shoot_cooling_heat;
+  uint16_t* shoot_cooling_rate;
 
        
   // shoot枪口枪口射速上限,shoot实时射速
@@ -235,8 +235,9 @@ public:
   void trigger_motor_turn_back(); //拨盘电机回转
   void shoot_bullet_control();
 
-
   void shoot_mode_change();
+
+  void get_cooling_ctrl_param(); //获取热量控制相关参数
 
 };
 

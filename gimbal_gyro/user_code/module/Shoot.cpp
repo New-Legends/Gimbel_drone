@@ -16,6 +16,7 @@ extern "C"
 
 #include "Gimbal.h"
 #include "Communicate.h"
+#include "Referee.h"
 
 #define shoot_fric1_on(pwm) fric1_on((pwm)) //摩擦轮1pwm宏定义
 #define shoot_fric2_on(pwm) fric2_on((pwm)) //摩擦轮2pwm宏定义
@@ -49,6 +50,8 @@ fp32 shoot_fric_grade[4] = {0, 2.06,2.15,2.15};
 fp32 shoot_trigger_grade[21] = {0, 12.05f * trigger_speed_to_radio, 14.05f * trigger_speed_to_radio, 15.80f * trigger_speed_to_radio, 19.15f * trigger_speed_to_radio, 16.05f * trigger_speed_to_radio,14.15f * trigger_speed_to_radio,13.45f * trigger_speed_to_radio,13.95f * trigger_speed_to_radio,14.15f * trigger_speed_to_radio,14.45f * trigger_speed_to_radio,16.91f * trigger_speed_to_radio,16.27f * trigger_speed_to_radio,15.95f * trigger_speed_to_radio,16.37f * trigger_speed_to_radio,17.80f * trigger_speed_to_radio,13.07f * trigger_speed_to_radio,13.96f * trigger_speed_to_radio,13.97f * trigger_speed_to_radio,15.95f * trigger_speed_to_radio,14.90f * trigger_speed_to_radio};
 Shoot shoot;
 
+extern Referee referee;
+
 /**
  * @brief          射击初始化，初始化PID，遥控器指针，电机指针
  * @param[in]      void
@@ -59,6 +62,9 @@ void Shoot::init()
     //遥控器指针
     shoot_rc = remote_control.get_remote_control_point();
     last_shoot_rc = remote_control.get_last_remote_control_point();
+
+    //获取热量控制相关参数
+    get_cooling_ctrl_param();
 
     //记录上一次按键值
     shoot_last_key_v = 0;
@@ -467,13 +473,6 @@ void Shoot::cooling_ctrl()
     //裁判系统提供的变量
     //更新射速
     last_bullet_speed = bullet_speed;
-    //热量上线
-    // shoot_cooling_limit = can_receive.gimbal_receive.shoot_cooling_limit; ， mode change 获取
-    // 当前热量
-//    shoot_cooling_heat = can_receive.gimbal_receive.shoot_cooling_heat;
-    // 冷却速率
-    // shoot_cooling_rate = can_receive.gimbal_receive.shoot_cooling_rate; ， mode change 获取
-    // 射速上线
     shoot_speed_limit = 25;
 
 //    robot_mode = can_receive.gimbal_receive.robot_mode;
@@ -501,7 +500,7 @@ void Shoot::cooling_ctrl()
     // 拨弹盘真实每秒子弹数
     
 
-    fp32 tmp_delta = shoot_cooling_limit - shoot_cooling_heat;
+    fp32 tmp_delta = *shoot_cooling_limit - *shoot_cooling_heat;
 
 
 
@@ -509,7 +508,7 @@ void Shoot::cooling_ctrl()
     #if SHOOT_HEAT_CTRL_SELECT
         //热量 当剩余热量低于30,强制制动
         //这是测出来的
-        if (shoot_cooling_limit - shoot_cooling_heat <= 30 && trigger_speed_grade != 0)
+        if (*shoot_cooling_limit - *shoot_cooling_heat <= 30 && trigger_speed_grade != 0)
         {
             last_trigger_speed_grade = trigger_speed_grade;
             trigger_speed_grade = 0;
@@ -527,7 +526,7 @@ void Shoot::cooling_ctrl()
         else if (tmp_delta >= Heat_Limit_Ceasefire_Threshold && tmp_delta < Heat_Limit_Slowdown_Threshold)
         {
                 Now_Ammo_Shoot_Frequency = (Target_Ammo_Shoot_Frequency * (Heat_Limit_Ceasefire_Threshold - tmp_delta) 
-    + shoot_cooling_rate / 10.0f * (tmp_delta - Heat_Limit_Slowdown_Threshold)) / (Heat_Limit_Ceasefire_Threshold - Heat_Limit_Slowdown_Threshold);
+    + *shoot_cooling_rate / 10.0f * (tmp_delta - Heat_Limit_Slowdown_Threshold)) / (Heat_Limit_Ceasefire_Threshold - Heat_Limit_Slowdown_Threshold);
         }
         else if (tmp_delta < Heat_Limit_Ceasefire_Threshold)
         {
@@ -595,8 +594,8 @@ void Shoot::solve()
 
     }
 
-    fric_motor_left.speed_limit();
-    fric_motor_right.speed_limit();
+    // fric_motor_left.speed_limit();
+    // fric_motor_right.speed_limit();
 
     //计算PID
     fric_motor_left.current_set = fric_motor_left.speed_pid.pid_calc();
@@ -693,53 +692,53 @@ void Shoot::shoot_mode_change()
         switch (robot_level)
         {
             case 1:
-                shoot_cooling_limit = 200;
-                shoot_cooling_rate = 10;
+                *shoot_cooling_limit = 200;
+                *shoot_cooling_rate = 10;
                 trigger_speed_grade = 1;
                 break;
             case 2:
-                shoot_cooling_limit = 250;
-                shoot_cooling_rate = 15;
+                *shoot_cooling_limit = 250;
+                *shoot_cooling_rate = 15;
                 trigger_speed_grade = 2;
                 break;
             case 3:
-                shoot_cooling_limit = 300;
-                shoot_cooling_rate = 20;
+                *shoot_cooling_limit = 300;
+                *shoot_cooling_rate = 20;
                 trigger_speed_grade = 3;
                 break;
             case 4:
-                shoot_cooling_limit = 350;
-                shoot_cooling_rate =25;
+                *shoot_cooling_limit = 350;
+                *shoot_cooling_rate =25;
                 trigger_speed_grade = 4;
                 break;
             case 5:
-                shoot_cooling_limit = 400;
-                shoot_cooling_rate = 30;
+                *shoot_cooling_limit = 400;
+                *shoot_cooling_rate = 30;
                 trigger_speed_grade = 5;
                 break;
             case 6:
-                shoot_cooling_limit = 450;
-                shoot_cooling_rate = 35;
+                *shoot_cooling_limit = 450;
+                *shoot_cooling_rate = 35;
                 trigger_speed_grade = 6;
                 break;
             case 7:
-                shoot_cooling_limit = 500;
-                shoot_cooling_rate = 40;
+                *shoot_cooling_limit = 500;
+                *shoot_cooling_rate = 40;
                 trigger_speed_grade = 7;
                 break;
             case 8:
-                shoot_cooling_limit = 550;
-                shoot_cooling_rate = 45;
+                *shoot_cooling_limit = 550;
+                *shoot_cooling_rate = 45;
                 trigger_speed_grade = 8;
                 break;
             case 9:
-                shoot_cooling_limit = 600;
-                shoot_cooling_rate = 50;
+                *shoot_cooling_limit = 600;
+                *shoot_cooling_rate = 50;
                 trigger_speed_grade = 9;
                 break;
             case 10:
-                shoot_cooling_limit = 650;
-                shoot_cooling_rate = 60;
+                *shoot_cooling_limit = 650;
+                *shoot_cooling_rate = 60;
                 trigger_speed_grade = 10;    
                 break;
 
@@ -753,53 +752,53 @@ void Shoot::shoot_mode_change()
         switch (robot_level)
         {
             case 1:
-                shoot_cooling_limit = 50;
-                shoot_cooling_rate = 40;
+                *shoot_cooling_limit = 50;
+                *shoot_cooling_rate = 40;
                 trigger_speed_grade = 11;
                 break;
             case 2:
-                shoot_cooling_limit = 85;
-                shoot_cooling_rate = 45;
+                *shoot_cooling_limit = 85;
+                *shoot_cooling_rate = 45;
                 trigger_speed_grade = 12;
                 break;
             case 3:
-                shoot_cooling_limit = 120;
-                shoot_cooling_rate = 50;
+                *shoot_cooling_limit = 120;
+                *shoot_cooling_rate = 50;
                 trigger_speed_grade = 13;
                 break;
             case 4:
-                shoot_cooling_limit = 155;
-                shoot_cooling_rate = 55;
+                *shoot_cooling_limit = 155;
+                *shoot_cooling_rate = 55;
                 trigger_speed_grade = 14;
                 break;
             case 5:
-                shoot_cooling_limit = 190;
-                shoot_cooling_rate = 60;
+                *shoot_cooling_limit = 190;
+                *shoot_cooling_rate = 60;
                 trigger_speed_grade = 15;
                 break;
             case 6:
-                shoot_cooling_limit = 225;
-                shoot_cooling_rate = 65;
+                *shoot_cooling_limit = 225;
+                *shoot_cooling_rate = 65;
                 trigger_speed_grade = 16;
                 break;
             case 7:
-                shoot_cooling_limit = 260;
-                shoot_cooling_rate =70;
+                *shoot_cooling_limit = 260;
+                *shoot_cooling_rate =70;
                 trigger_speed_grade = 17;
                 break;
             case 8:
-                shoot_cooling_limit = 295;
-                shoot_cooling_rate = 75;
+                *shoot_cooling_limit = 295;
+                *shoot_cooling_rate = 75;
                 trigger_speed_grade = 18;
                 break;
             case 9:
-                shoot_cooling_limit = 330;
-                shoot_cooling_rate = 80;
+                *shoot_cooling_limit = 330;
+                *shoot_cooling_rate = 80;
                 trigger_speed_grade = 19;
                 break;
             case 10:
-                shoot_cooling_limit = 400;
-                shoot_cooling_rate = 80;
+                *shoot_cooling_limit = 400;
+                *shoot_cooling_rate = 80;
                 trigger_speed_grade = 20;    
                 break;
 
@@ -810,8 +809,8 @@ void Shoot::shoot_mode_change()
     }
     else
     {
-        shoot_cooling_limit = 200;
-        shoot_cooling_rate = 10;
+        *shoot_cooling_limit = 200;
+        *shoot_cooling_rate = 10;
         trigger_speed_grade = 1; 
     }
 }
@@ -833,4 +832,14 @@ bool_t shoot_open_fric_cmd_to_gimbal_up()
     {
         return 1;
     }
+}
+
+/**
+ * @brief          获取热量控制相关参数
+ */
+void Shoot::get_cooling_ctrl_param()
+{
+    shoot_cooling_limit = referee.get_shoot_limit();
+    shoot_cooling_heat  = referee.get_shoot_17mm_barrel_heat();
+    shoot_cooling_rate  = referee.get_shoot_barrel_cooling_value();
 }

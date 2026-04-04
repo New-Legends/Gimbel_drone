@@ -541,3 +541,28 @@ void Referee::leida_data_unpack(void)
 {
     memcpy(&leida_data, student_interactive_data_t.user_data, sizeof(leida_data));
 }
+
+
+
+/***  用户函数  ****/
+
+/**
+  * @brief  返回机器人射击相关数据
+  */
+
+uint16_t* Referee::get_shoot_limit()
+{
+    return (uint16_t*)&(robot_status.shooter_barrel_heat_limit);
+}
+
+uint16_t* Referee::get_shoot_17mm_barrel_heat()
+{
+    return (uint16_t*)&(power_heat_data_t.shooter_17mm_barrel_heat);
+}
+
+uint16_t* Referee::get_shoot_barrel_cooling_value()
+{
+    return (uint16_t*)&(robot_status.shooter_barrel_cooling_value);
+}
+
+

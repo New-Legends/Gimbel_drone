@@ -44,6 +44,7 @@ void Communicate::init()
 {
     remote_control.init();
     can_receive.init();
+    referee.init();
     //debug.gimbal_debug_init(&gimbal.yaw)
     vision_init();
 }
