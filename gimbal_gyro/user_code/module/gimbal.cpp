@@ -247,9 +247,9 @@ void Gimbal::gimbal_data_update()
     /*------------------------yaw电机数据更新----------------------------  */
     gimbal_yaw_motor.gyro_angle = gimbal_INT_angle_point[2];
     #if YAW_TURN
-        gimbal_yaw_motor.encode_angle = - can_receive.gimbel_gim[CAN_YAW_GIMOTOR_ID-1].actual_position;
+        gimbal_yaw_motor.encode_angle = - (can_receive.gimbel_gim[CAN_YAW_GIMOTOR_ID-1].actual_position - YAW_MID_GIM);
     #else
-        gimbal_yaw_motor.encode_angle = can_receive.gimbel_gim[CAN_YAW_GIMOTOR_ID-1].actual_position;
+        gimbal_yaw_motor.encode_angle = (can_receive.gimbel_gim[CAN_YAW_GIMOTOR_ID-1].actual_position - YAW_MID_GIM);
     #endif
     //在云台归中时,读取的速度为编码器反馈的
     if (gimbal_mode == GIMBAL_TO_MID)
@@ -262,9 +262,9 @@ void Gimbal::gimbal_data_update()
     gimbal_pitch_motor.gyro_angle = gimbal_INT_angle_point[1];
 
 #if PITCH_TURN
-    gimbal_pitch_motor.encode_angle = - can_receive.gimbel_gim[CAN_PITCH_GIMOTOR_ID-1].actual_position;
+    gimbal_pitch_motor.encode_angle = - (can_receive.gimbel_gim[CAN_PITCH_GIMOTOR_ID-1].actual_position - PITCH_MID_GIM);
 #else
-    gimbal_pitch_motor.encode_angle = can_receive.gimbel_gim[CAN_PITCH_GIMOTOR_ID-1].actual_position;
+    gimbal_pitch_motor.encode_angle = (can_receive.gimbel_gim[CAN_PITCH_GIMOTOR_ID-1].actual_position - PITCH_MID_GIM);
 #endif
     //在云台归中时,读取的速度为编码器反馈的
     if (gimbal_mode == GIMBAL_TO_MID || gimbal_mode == GIMBAL_FREE)
@@ -278,6 +278,7 @@ void Gimbal::gimbal_data_update()
  * @retval         none
  * @Author         summerpray
  */
+fp32 debug_tp;
 void Gimbal::output()
 {
 

@@ -45,7 +45,9 @@ void Communicate::init()
     remote_control.init();
     can_receive.init();
     referee.init();
-    //debug.gimbal_debug_init(&gimbal.yaw)
+    debug.gimbal_debug_init(&gimbal.gimbal_yaw_motor.gyro_angle,&gimbal.gimbal_yaw_motor.speed,&gimbal.gimbal_yaw_motor.gyro_angle_set,
+                            &gimbal.gimbal_pitch_motor.gyro_angle,&gimbal.gimbal_pitch_motor.speed,&gimbal.gimbal_pitch_motor.gyro_angle_set,
+                            &huart1);
     vision_init();
 }
 
@@ -53,12 +55,13 @@ void Communicate::run()
 {
     //发送数据给视觉
     //vision_send_data(gimbal.vision_cmdid);
-    #if GIMABL_VISION_MODE
-    vision_send_data_jun(1);
-    #else
-    vision_send_data_rv2(1);
-    #endif
+    //#if GIMABL_VISION_MODE
+    //vision_send_data_jun(1);
+    //#else
+    //vision_send_data_rv2(1);
+    //#endif
     referee.unpack();
+    debug.gimbal_debug_send();
 
 }
 

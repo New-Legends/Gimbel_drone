@@ -13,7 +13,7 @@ public:
     fp32 out;          //滤波输出的数据
     fp32 num[1];       //滤波参数
     fp32 frame_period; //滤波的时间间隔 单位 s
-    void init(fp32 frame_period, const fp32 num[1]);
+    void init(fp32 frame_period_, const fp32 num[1]);
     void first_high_pass_filter_cali(fp32 input);
 };
 

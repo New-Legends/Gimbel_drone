@@ -25,9 +25,9 @@
 #define CAN_ID 0X01
 #define MASTER_ID 0X11
 
-#define angle_to_rad 57.2957795f
+#define angle_to_rad 57.2957795f //达妙imu输出的是角度至，我们使用弧度至计算
 
-#define IMU_active_mode 1
+#define IMU_active_mode 0
 
 typedef enum
 {
@@ -93,6 +93,8 @@ typedef struct
 	float q[4];
 
 	float cur_temp;
+
+	uint32_t imu_receive_daley_time;
 
 }imu_t;
 

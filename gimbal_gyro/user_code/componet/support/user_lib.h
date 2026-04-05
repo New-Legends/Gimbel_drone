@@ -28,4 +28,7 @@ extern uint16_t float_to_uint(float x_float, float x_min, float x_max, int bits)
 
 extern float uint_to_float(int x_int, float x_min, float x_max, int bits);
 
+//返回任务执行间隔时间
+extern uint32_t get_running_time(uint32_t* last_time);
+
 #endif //CLASSIS_BOARD_USER_LIB_H

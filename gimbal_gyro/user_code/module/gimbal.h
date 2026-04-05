@@ -159,6 +159,10 @@ extern "C"
     #define PITCH_AUTO_PID_KD 3.0f //0.1
     #define PITCH_AUTO_PID_MAX_IOUT 1.0f
     #define PITCH_AUTO_PID_MAX_OUT 150.0f
+
+    //GIM电机的中值，因为这个电机0点总是变，并且还没试过给他发设0点函数，上位机设置也不起作用
+    #define YAW_MID_GIM     0.0f
+    #define PITCH_MID_GIM   2.98714447f
 #endif
 
 
@@ -201,7 +205,7 @@ extern "C"
 #define YAW 0
 #define PITCH 1
 
-//电机正反装所对应的
+//电机正反装所对应的,如果时GIM电机则顺时针为正会和这里相反
 #define YAW_TURN 0
 #define PITCH_TURN 0
 
@@ -218,14 +222,14 @@ extern "C"
 #define MAX_GYRO_YAW PI
 #define MIN_GYRO_YAW -PI
 
-#define MAX_GYRO_PITCH 0.64f
-#define MIN_GYRO_PITCH -0.23f
+#define MAX_GYRO_PITCH 0.54f
+#define MIN_GYRO_PITCH -0.05f
 
 #define MAX_ENCODE_YAW 2*PI
 #define MIN_ENCODE_YAW -2*PI
 
-#define MAX_ENCODE_PITCH 1.08f
-#define MIN_ENCODE_PITCH -0.12f
+#define MAX_ENCODE_PITCH 0.54f
+#define MIN_ENCODE_PITCH -0.05f
 
 //云台初始化回中值，允许的误差,并且在误差范围内停止一段时间以及最大时间6s后解除初始化状态，
 #define GIMBAL_TO_MID_ERROR 0.05f
@@ -341,6 +345,8 @@ public:
     bool_t vision_mode_change_shoot_flag;
     bool_t press_vision_color_change_flag;
     bool_t press_vision_shoot_change_flag;
+
+    uint32_t gimbal_task_time; //云台任务一个周期的时间
 
     void init();                         //云台初始化
     void set_mode();                     //设置云台控制模式

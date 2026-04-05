@@ -38,29 +38,20 @@ class Debug
 {
 public:
 
-fp32 tx_buffer1[2]; 
-fp32 tx_buffer2[2]; 
-fp32 tx_buffer3[2]; 
-fp32 tx_buffer4[2]; 
+fp32 tx_buffer[4][2]; 
+// fp32 tx_buffer2[2]; 
+// fp32 tx_buffer3[2]; 
+// fp32 tx_buffer4[2]; 
 
 debug_data_t debug_data;
 
 gimbal_debug_data_t gimbal_debug_data;
 
-void write_1_int();
-void write_2_int();
-void write_3_int();
-void write_4_int();
 
-//发送字节
-void send_1_int();
-void send_2_int();
-void send_3_int();
-void send_4_int();
 void send_ending_int();
 
 //无人机云台用调试
-void gimbal_debug_init(float* yaw_rad , float* yaw_rad_s , float* pitch_rad, float* pitch_rad_s ,UART_HandleTypeDef* uart );
+void gimbal_debug_init(float* yaw_rad , float* yaw_rad_s , float* yaw_set , float* pitch_rad, float* pitch_rad_s ,float* pitch_set, UART_HandleTypeDef* uart );
 void gimbal_debug_send();
 
 uint8_t UART_Send_Data(UART_HandleTypeDef *huart, uint8_t *Data, uint16_t Length);

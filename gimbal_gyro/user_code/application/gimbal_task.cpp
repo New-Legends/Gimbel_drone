@@ -46,12 +46,15 @@
   ****************************(C) COPYRIGHT 2021 *******************************
   */
 #include "gimbal_task.h"
+#include "user_lib.h"
 
 //为了让陀螺仪每次的初始位姿一致,等云台归中后再开启陀螺仪
 bool_t gimbal_imu_open_flag = true;
 
 void gimbal_task(void *pvParameters)
 {
+    static uint32_t last_time = 0 ;
+
     vTaskDelay(GIMBAL_TASK_INIT_TIME);
     //云台初始化
     gimbal.init();
@@ -69,6 +72,8 @@ void gimbal_task(void *pvParameters)
       gimbal.solve();
       //输出电流
       gimbal.output();
+      //计算任务时间间隔
+      gimbal.gimbal_task_time = get_running_time(&last_time);
       //系统延时
       vTaskDelay(GIMBAL_CONTROL_TIME_MS);
     }

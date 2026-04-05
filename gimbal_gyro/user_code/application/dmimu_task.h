@@ -7,7 +7,7 @@
 //����ʼ����һ��ʱ��
 #define DMIMU_TASK_INIT_TIME 201
 
-#define DMIMU_CONTROL_TIME_MS 2
+#define DMIMU_CONTROL_TIME_MS 1
 
 
 extern void dmimu_task(void *pvParameters);

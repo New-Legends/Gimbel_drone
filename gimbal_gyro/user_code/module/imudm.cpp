@@ -139,9 +139,9 @@ void IMU_UpdateGyro(uint8_t* pData)
 	gyro[1]=pData[5]<<8|pData[4];
 	gyro[2]=pData[7]<<8|pData[6];
 	
-	imudm.gyro[0]=uint_to_float(gyro[0],GYRO_CAN_MIN,GYRO_CAN_MAX,16);
-	imudm.gyro[1]=uint_to_float(gyro[1],GYRO_CAN_MIN,GYRO_CAN_MAX,16);
-	imudm.gyro[2]=uint_to_float(gyro[2],GYRO_CAN_MIN,GYRO_CAN_MAX,16);
+	imudm.gyro[0]=uint_to_float(gyro[0],GYRO_CAN_MIN,GYRO_CAN_MAX,16)/angle_to_rad;
+	imudm.gyro[1]=uint_to_float(gyro[1],GYRO_CAN_MIN,GYRO_CAN_MAX,16)/angle_to_rad;
+	imudm.gyro[2]=uint_to_float(gyro[2],GYRO_CAN_MIN,GYRO_CAN_MAX,16)/angle_to_rad;
 }
 
 
@@ -189,7 +189,10 @@ fp32* get_IMU_Quaternion_point(void)
 
 void IMU_UpdateData(uint8_t* pData)
 {
-
+	static uint32_t last_recive_time;
+	uint32_t time = HAL_GetTick();
+	imudm.imu_receive_daley_time = time - last_recive_time;
+	last_recive_time = time;
 	switch(pData[0])
 	{
 		case 1:

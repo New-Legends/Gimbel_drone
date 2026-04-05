@@ -4,6 +4,7 @@
 
 #include "user_lib.h"
 #include "arm_math.h"
+#include "main.h"
 
 //循环限幅函数
 fp32 loop_fp32_constrain(fp32 Input, fp32 minValue, fp32 maxValue) {
@@ -89,4 +90,13 @@ float uint_to_float(int x_int, float x_min, float x_max, int bits)
 	float span = x_max - x_min;
 	float offset = x_min;
 	return ((float)x_int)*span/((float)((1<<bits)-1)) + offset;
+}
+
+
+uint32_t get_running_time(uint32_t* last_time)
+{
+    uint32_t time = HAL_GetTick();
+    uint32_t running_time = time - *last_time;
+    *last_time = time;
+    return running_time;
 }
