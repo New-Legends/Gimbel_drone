@@ -134,14 +134,22 @@ void IMU_UpdateAccel(uint8_t* pData)
 void IMU_UpdateGyro(uint8_t* pData)
 {
 	uint16_t gyro[3];
+
+	static float gyro_last[3];
 	
 	gyro[0]=pData[3]<<8|pData[2];
 	gyro[1]=pData[5]<<8|pData[4];
 	gyro[2]=pData[7]<<8|pData[6];
 	
-	imudm.gyro[0]=uint_to_float(gyro[0],GYRO_CAN_MIN,GYRO_CAN_MAX,16)/angle_to_rad;
-	imudm.gyro[1]=uint_to_float(gyro[1],GYRO_CAN_MIN,GYRO_CAN_MAX,16)/angle_to_rad;
-	imudm.gyro[2]=uint_to_float(gyro[2],GYRO_CAN_MIN,GYRO_CAN_MAX,16)/angle_to_rad;
+	imudm.gyro_ori[0]=uint_to_float(gyro[0],GYRO_CAN_MIN,GYRO_CAN_MAX,16)/angle_to_rad;
+	imudm.gyro_ori[1]=uint_to_float(gyro[1],GYRO_CAN_MIN,GYRO_CAN_MAX,16)/angle_to_rad;
+	imudm.gyro_ori[2]=uint_to_float(gyro[2],GYRO_CAN_MIN,GYRO_CAN_MAX,16)/angle_to_rad;
+
+	//对输出的角速度做滤波
+	imudm.gyro[1] = first_order_low_pass_filter(imudm.gyro_ori[1],gyro_last[1],imudm.weight);
+	gyro_last[1] = imudm.gyro[1];
+	imudm.gyro[2] = first_order_low_pass_filter(imudm.gyro_ori[2],gyro_last[2],imudm.weight);
+	gyro_last[2] = imudm.gyro[1];
 }
 
 
@@ -212,6 +220,7 @@ void IMU_UpdateData(uint8_t* pData)
 
 void DM_IMU_INIT()
 {
+	imudm.weight = 0.5;
     imu_init(CAN_ID ,MASTER_ID ,NULL);
 }
 
@@ -251,22 +260,17 @@ void IMU_run()
 
 
 #else
-    tick_ms++;
-	if(tick_ms%3==0)
+	static uint8_t i;
+	if (i == 0)
 	{
-		//imu_request_accel();
 		imu_request_euler();
+		i = 1;
 	}
-	else if(tick_ms%2==0)
+	else
 	{
-		imu_request_gyro();
+		imu_request_euler();
+		i = 0;
 	}
-	else if(tick_ms%1==0)
-	{
-		imu_request_quat();
-	}
-	
-	if(tick_ms>1000)
-		tick_ms=0;
+
 #endif
 }

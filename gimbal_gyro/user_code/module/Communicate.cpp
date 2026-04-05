@@ -35,6 +35,7 @@ extern Shoot shoot;
 
 extern bool_t rune;
 extern Gimbal gimbal;
+extern imu_t imudm;
 
 //在vision 定义
 extern SendPacketTwist_t SendPacketTwist;

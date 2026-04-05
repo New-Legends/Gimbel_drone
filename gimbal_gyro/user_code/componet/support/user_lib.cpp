@@ -100,3 +100,18 @@ uint32_t get_running_time(uint32_t* last_time)
     *last_time = time;
     return running_time;
 }
+
+/**
+ * @brief 一阶低通滤波函数
+ * @param now_data  本次原始采样数据
+ * @param last_data 上次滤波后的数据
+ * @param weight    新数据权重(0~1之间，如0.1表示新数据占10%，历史占90%)
+ * @return float    本次滤波后的数据
+ */
+float first_order_low_pass_filter(float now_data, float last_data, float weight)
+{
+    // 一阶低通滤波核心公式：滤波值 = 新数据*权重 + 旧数据*(1-权重)
+    float filter_data = now_data * weight + last_data * (1 - weight);
+    
+    return filter_data;
+}

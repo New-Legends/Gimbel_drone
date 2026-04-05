@@ -88,6 +88,7 @@ typedef struct
 	float angle[3];
 
 	float gyro[3];
+	float gyro_ori[3];
 	float accel[3];
 	
 	float q[4];
@@ -95,6 +96,8 @@ typedef struct
 	float cur_temp;
 
 	uint32_t imu_receive_daley_time;
+
+	float weight;//角速度滤波权重
 
 }imu_t;
 

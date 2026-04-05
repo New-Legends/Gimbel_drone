@@ -112,20 +112,20 @@ extern "C"
     #define PITCH_SPEED_PID_KI 0.0f
     #define PITCH_SPEED_PID_KD 25.0f
     #define PITCH_SPEED_PID_MAX_IOUT 10.0f
-    #define PITCH_SPEED_PID_MAX_OUT 20000.0f //15000
+    #define PITCH_SPEED_PID_MAX_OUT 3.0f //15000
 
     /*------------------------------陀螺仪PID------------------------*/
     // yaw轴陀螺仪PID 由陀螺仪角度控制
-    #define YAW_GYRO_PID_KP 7.5f  //20.0
+    #define YAW_GYRO_PID_KP 0.0f//20.0
     #define YAW_GYRO_PID_KI 0.0f
-    #define YAW_GYRO_PID_KD 200.0f    //12.0f
+    #define YAW_GYRO_PID_KD 0.0f    //12.0f
     #define YAW_GYRO_PID_MAX_IOUT 0.2f
     #define YAW_GYRO_PID_MAX_OUT 120.0f
 
     //pitch轴陀螺仪PID 由陀螺仪角度控制
-    #define PITCH_GYRO_PID_KP 7.5f 
+    #define PITCH_GYRO_PID_KP 45.0f
     #define PITCH_GYRO_PID_KI 0.0f
-    #define PITCH_GYRO_PID_KD 200.0f
+    #define PITCH_GYRO_PID_KD 2000.0f
     #define PITCH_GYRO_PID_MAX_IOUT 10.0f
     #define PITCH_GYRO_PID_MAX_OUT 500.0f
 
@@ -139,9 +139,9 @@ extern "C"
     #define YAW_ENCODE_PID_MAX_OUT 20.0f
 
     // pitch轴编码器PID 由编码器角度控制
-    #define PITCH_ENCODE_PID_KP 10.0f
+    #define PITCH_ENCODE_PID_KP 45.0f
     #define PITCH_ENCODE_PID_KI 0.0f
-    #define PITCH_ENCODE_PID_KD 80.0f
+    #define PITCH_ENCODE_PID_KD 2000.0f
     #define PITCH_ENCODE_PID_MAX_IOUT 1.0f
     #define PITCH_ENCODE_PID_MAX_OUT 100.0f
 
@@ -363,6 +363,7 @@ public:
     void recover_normal_pid();           //返回正常PID
     void turn_around_control(fp32 *yaw); //掉头控制
     void solve();                        //云台控制PID计算
+    float pitch_g_com();         //pitch轴重力补偿计算
     void output();                       //输出电流
 
     /***************************(C) GIMBAL control *******************************/

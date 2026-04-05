@@ -244,6 +244,7 @@ void Gimbal::output()
 #if GIM_MOTOR
 void Gimbal::gimbal_data_update()
 {
+    static float pitch_speed_last;
     /*------------------------yaw电机数据更新----------------------------  */
     gimbal_yaw_motor.gyro_angle = gimbal_INT_angle_point[2];
     #if YAW_TURN
@@ -266,11 +267,15 @@ void Gimbal::gimbal_data_update()
 #else
     gimbal_pitch_motor.encode_angle = (can_receive.gimbel_gim[CAN_PITCH_GIMOTOR_ID-1].actual_position - PITCH_MID_GIM);
 #endif
-    //在云台归中时,读取的速度为编码器反馈的
-    if (gimbal_mode == GIMBAL_TO_MID || gimbal_mode == GIMBAL_FREE)
-        gimbal_pitch_motor.speed = can_receive.gimbel_gim[CAN_PITCH_GIMOTOR_ID-1].actual_speed;
-    else
-        gimbal_pitch_motor.speed = gimbal_INT_gyro_point[1];
+    //在云台归中时,读取的速度为编码器反馈的    暂时注释都只使用电机的数据
+    // if (gimbal_mode == GIMBAL_TO_MID || gimbal_mode == GIMBAL_FREE)
+    //     gimbal_pitch_motor.speed = can_receive.gimbel_gim[CAN_PITCH_GIMOTOR_ID-1].actual_speed;
+    // else
+    //     gimbal_pitch_motor.speed = gimbal_INT_gyro_point[1];
+    //gimbal_pitch_motor.speed = can_receive.gimbel_gim[CAN_PITCH_GIMOTOR_ID-1].actual_speed;
+    //对速度滤波一下
+    gimbal_pitch_motor.speed = first_order_low_pass_filter(can_receive.gimbel_gim[CAN_PITCH_GIMOTOR_ID-1].actual_speed , pitch_speed_last , 0.6);
+    pitch_speed_last = gimbal_pitch_motor.speed;
 }
 
 /**
@@ -281,6 +286,7 @@ void Gimbal::gimbal_data_update()
 fp32 debug_tp;
 void Gimbal::output()
 {
+    gimbal_pitch_motor.current_set +=pitch_g_com();
 
 //根据电机正反转,调解电流发送
 #if YAW_TURN
@@ -1052,4 +1058,10 @@ bool_t gimbal_cmd_to_shoot_stop(void)
     {
         return 0;
     }
+}
+
+/*pitch重力补偿：F*sin(angle + fi)   */
+float Gimbal::pitch_g_com()
+{
+    return 1.205*sin(gimbal_pitch_motor.gyro_angle + 2.155);
 }

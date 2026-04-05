@@ -31,4 +31,6 @@ extern float uint_to_float(int x_int, float x_min, float x_max, int bits);
 //返回任务执行间隔时间
 extern uint32_t get_running_time(uint32_t* last_time);
 
+extern float first_order_low_pass_filter(float now_data, float last_data, float weight);
+
 #endif //CLASSIS_BOARD_USER_LIB_H
