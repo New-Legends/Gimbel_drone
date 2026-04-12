@@ -103,9 +103,9 @@ extern "C"
     #define YAW_SPEED_PID_KP 4.5f
     #define YAW_SPEED_PID_KI 0.0f
     #define YAW_SPEED_PID_KD 25.0f
-    #define YAW_SPEED_PID_MAX_IOUT 25.0f
+    #define YAW_SPEED_PID_MAX_IOUT 10.0f
 
-    #define YAW_SPEED_PID_MAX_OUT 20000.0f
+    #define YAW_SPEED_PID_MAX_OUT 3.0f
 
     // pitch 速度环
     #define PITCH_SPEED_PID_KP 4.5f // 2900
@@ -116,9 +116,9 @@ extern "C"
 
     /*------------------------------陀螺仪PID------------------------*/
     // yaw轴陀螺仪PID 由陀螺仪角度控制
-    #define YAW_GYRO_PID_KP 0.0f//20.0
+    #define YAW_GYRO_PID_KP 45.0f//20.0
     #define YAW_GYRO_PID_KI 0.0f
-    #define YAW_GYRO_PID_KD 0.0f    //12.0f
+    #define YAW_GYRO_PID_KD 6000.0f    //12.0f
     #define YAW_GYRO_PID_MAX_IOUT 0.2f
     #define YAW_GYRO_PID_MAX_OUT 120.0f
 
@@ -132,11 +132,11 @@ extern "C"
 
     /*------------------------------编码器PID------------------------*/
     // yaw轴编码器PID 由编码器角度控制
-    #define YAW_ENCODE_PID_KP 10.0f
+    #define YAW_ENCODE_PID_KP 45.0f
     #define YAW_ENCODE_PID_KI 0.0f
-    #define YAW_ENCODE_PID_KD 80.0f
-    #define YAW_ENCODE_PID_MAX_IOUT 5.0f
-    #define YAW_ENCODE_PID_MAX_OUT 20.0f
+    #define YAW_ENCODE_PID_KD 2500.0f
+    #define YAW_ENCODE_PID_MAX_IOUT 1.0f
+    #define YAW_ENCODE_PID_MAX_OUT 100.0f
 
     // pitch轴编码器PID 由编码器角度控制
     #define PITCH_ENCODE_PID_KP 45.0f
@@ -161,8 +161,8 @@ extern "C"
     #define PITCH_AUTO_PID_MAX_OUT 150.0f
 
     //GIM电机的中值，因为这个电机0点总是变，并且还没试过给他发设0点函数，上位机设置也不起作用
-    #define YAW_MID_GIM     0.0f
-    #define PITCH_MID_GIM   2.98714447f
+    #define YAW_MID_GIM     -2.13988686f
+    #define PITCH_MID_GIM   3.29461384f
 #endif
 
 

@@ -244,7 +244,7 @@ void Gimbal::output()
 #if GIM_MOTOR
 void Gimbal::gimbal_data_update()
 {
-    static float pitch_speed_last;
+    static float pitch_speed_last , yaw_speed_last;
     /*------------------------yaw电机数据更新----------------------------  */
     gimbal_yaw_motor.gyro_angle = gimbal_INT_angle_point[2];
     #if YAW_TURN
@@ -253,10 +253,12 @@ void Gimbal::gimbal_data_update()
         gimbal_yaw_motor.encode_angle = (can_receive.gimbel_gim[CAN_YAW_GIMOTOR_ID-1].actual_position - YAW_MID_GIM);
     #endif
     //在云台归中时,读取的速度为编码器反馈的
-    if (gimbal_mode == GIMBAL_TO_MID)
-        gimbal_yaw_motor.speed = can_receive.gimbel_gim[CAN_YAW_GIMOTOR_ID-1].actual_speed;
-    else
-        gimbal_yaw_motor.speed = gimbal_INT_gyro_point[2];
+    // if (gimbal_mode == GIMBAL_TO_MID)
+    //     gimbal_yaw_motor.speed = can_receive.gimbel_gim[CAN_YAW_GIMOTOR_ID-1].actual_speed;
+    // else
+    //     gimbal_yaw_motor.speed = gimbal_INT_gyro_point[2];
+    gimbal_yaw_motor.speed = first_order_low_pass_filter(can_receive.gimbel_gim[CAN_YAW_GIMOTOR_ID-1].actual_speed , yaw_speed_last , 0.45);
+    yaw_speed_last = gimbal_yaw_motor.speed;
 
     /*------------------------pitch电机数据更新----------------------------  */
     // pitch电机
@@ -1060,7 +1062,10 @@ bool_t gimbal_cmd_to_shoot_stop(void)
     }
 }
 
-/*pitch重力补偿：F*sin(angle + fi)   */
+/*pitch重力补偿：F*sin(angle + fi) 
+    F和fi标定方式：读取云台角度angle，读取gimbal输出的current_set
+    解二元一次方程组，
+*/
 float Gimbal::pitch_g_com()
 {
     return 1.205*sin(gimbal_pitch_motor.gyro_angle + 2.155);
