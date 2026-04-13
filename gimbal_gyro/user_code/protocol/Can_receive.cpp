@@ -165,13 +165,18 @@ void Can_receive::can_cmd_motor_start(uint8_t id)
  */
 void Can_receive::cmd_yaw_and_pitch(void)
 {
-    for (uint8_t i = 0; i < 10; i++)
+    vTaskDelay(20);
+    // for (uint8_t i = 0; i < 10; i++)
+    // {
+    //     can_cmd_motor_start(CAN_YAW_GIMOTOR_ID);
+    //     vTaskDelay(3);
+    // }
+    for (uint8_t i = 0; i < 20; i++)
     {
         can_cmd_motor_start(CAN_PITCH_GIMOTOR_ID);
-        vTaskDelay(1);
-        can_cmd_motor_start(CAN_YAW_GIMOTOR_ID);
-        vTaskDelay(1);
+        vTaskDelay(3);
     }
+
 }
 
 /**

@@ -53,7 +53,7 @@ typedef enum
     CAN_PITCH_MOTOR_ID = 0x206,//can2
     CAN_GIMBAL_ALL_ID = 0x1FF,
 
-    //云台GIM电机接收ID can1
+    //云台GIM电机接收ID can1  在这里记录一下GIM电机的毛病，不可以和c板陀螺仪一起使用会报错0x02（指令错误），使能前要关闭pwm否则失败，
     CAN_PITCH_GIMOTOR_ID = 0x02,
     CAN_YAW_GIMOTOR_ID = 0x01,
 

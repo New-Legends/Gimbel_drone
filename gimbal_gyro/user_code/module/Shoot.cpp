@@ -2,13 +2,13 @@
 
 #include "main.h"
 
-#include "bsp_fric.h"
 #include "user_lib.h"
 
 #ifdef __cplusplus //告诉编译器，这部分代码按C语言的格式进行编译，而不是C++的
 extern "C"
 {
 #include "bsp_laser.h"
+#include "bsp_fric.h"
 }
 #endif
 
@@ -20,6 +20,7 @@ extern "C"
 
 #define shoot_fric1_on(pwm) fric1_on((pwm)) //摩擦轮1pwm宏定义
 #define shoot_fric2_on(pwm) fric2_on((pwm)) //摩擦轮2pwm宏定义
+#define shoot_fric3_on(pwm) fric3_on((pwm)) //摩擦轮3pwm宏定义
 #define shoot_fric_off() fric_off()         //关闭两个摩擦轮
 
 #define shoot_laser_on() laser_on()   //激光开启宏定义
@@ -51,6 +52,9 @@ fp32 shoot_trigger_grade[21] = {0, 12.05f * trigger_speed_to_radio, 14.05f * tri
 Shoot shoot;
 
 extern Referee referee;
+extern TIM_HandleTypeDef htim1;
+
+void tim_init_shoot();
 
 /**
  * @brief          射击初始化，初始化PID，遥控器指针，电机指针
@@ -59,6 +63,11 @@ extern Referee referee;
  */
 void Shoot::init()
 {
+
+    
+    //给snail油门信号
+    //snail_mode_sw();
+
     //遥控器指针
     shoot_rc = remote_control.get_remote_control_point();
     last_shoot_rc = remote_control.get_last_remote_control_point();
@@ -127,6 +136,8 @@ void Shoot::init()
 
     shoot_cmd_slow_fric_left.init(SHOOT_CONTROL_TIME, chassis_x_order_filter);
     shoot_cmd_slow_fric_right.init(SHOOT_CONTROL_TIME, chassis_y_order_filter);
+
+    tim_init_shoot();
 
     //更新数据
     feedback_update();
@@ -199,9 +210,10 @@ void Shoot::set_mode()
     }
 
     //摩擦轮速度达到一定值,才可开启拨盘  为了便于测试,这里至少需要一个摩擦轮电机达到拨盘启动要求就可以开启拨盘
-    if (shoot_mode == SHOOT_READY_FRIC
-        && (abs_int16(fric_motor_left.motor_measure->speed_rpm) > abs_fp32(fric_motor_left.require_speed) 
-        && abs_int16(fric_motor_right.motor_measure->speed_rpm) > abs_fp32(fric_motor_right.require_speed)))
+    // if (shoot_mode == SHOOT_READY_FRIC
+    //     && (abs_int16(fric_motor_left.motor_measure->speed_rpm) > abs_fp32(fric_motor_left.require_speed) 
+    //     && abs_int16(fric_motor_right.motor_measure->speed_rpm) > abs_fp32(fric_motor_right.require_speed)))
+    if(shoot_mode == SHOOT_READY_FRIC) //snail不反馈数据所以不判断转速
     {
         fric_status = TRUE;
         shoot_mode = SHOOT_READY_BULLET;
@@ -546,16 +558,17 @@ void Shoot::cooling_ctrl()
             trigger_motor.speed_set = Now_Ammo_Shoot_Frequency * 2.0f * PI / Ammo_Num_Per_Round * SHOOT_TRIGGER_DIRECTION ;
     #endif
 
-    //对摩擦轮电机输入控制值
-    fric_motor_left.speed_set = shoot_fric_grade[fric_speed_grade];
-    fric_motor_right.speed_set = shoot_fric_grade[fric_speed_grade];
+    // //对摩擦轮电机输入控制值
+    // fric_motor_left.speed_set = shoot_fric_grade[fric_speed_grade];
+    // fric_motor_right.speed_set = shoot_fric_grade[fric_speed_grade];
 
-    //一阶低通滤波作为摩擦轮输入
-    shoot_cmd_slow_fric_left.first_order_filter_cali(fric_motor_left.speed_set);
-    shoot_cmd_slow_fric_right.first_order_filter_cali(fric_motor_right.speed_set);
+    // //一阶低通滤波作为摩擦轮输入
+    // shoot_cmd_slow_fric_left.first_order_filter_cali(fric_motor_left.speed_set);
+    // shoot_cmd_slow_fric_right.first_order_filter_cali(fric_motor_right.speed_set);
 
-    fric_motor_left.speed_set = shoot_cmd_slow_fric_left.out;
-    fric_motor_right.speed_set = shoot_cmd_slow_fric_right.out;
+    // fric_motor_left.speed_set = shoot_cmd_slow_fric_left.out;
+    // fric_motor_right.speed_set = shoot_cmd_slow_fric_right.out;
+
 }
 
 /**
@@ -598,8 +611,9 @@ void Shoot::solve()
     // fric_motor_right.speed_limit();
 
     //计算PID
-    fric_motor_left.current_set = fric_motor_left.speed_pid.pid_calc();
-    fric_motor_right.current_set = fric_motor_right.speed_pid.pid_calc();
+    // fric_motor_left.current_set = fric_motor_left.speed_pid.pid_calc();
+    // fric_motor_right.current_set = fric_motor_right.speed_pid.pid_calc();
+    snail_mode_sw();
     trigger_motor.current_set = trigger_motor.speed_pid.pid_calc();
 
 
@@ -607,8 +621,8 @@ void Shoot::solve()
 
 void Shoot::output()
 {
-    fric_motor_left.current_give = -(int16_t)(fric_motor_left.current_set);
-    fric_motor_right.current_give = (int16_t)(fric_motor_right.current_set);
+    // fric_motor_left.current_give = -(int16_t)(fric_motor_left.current_set);
+    // fric_motor_right.current_give = (int16_t)(fric_motor_right.current_set);
     trigger_motor.current_give = trigger_motor.current_set;
 
 
@@ -842,4 +856,57 @@ void Shoot::get_cooling_ctrl_param()
     shoot_cooling_limit = referee.get_shoot_limit();
     shoot_cooling_heat  = referee.get_shoot_17mm_barrel_heat();
     shoot_cooling_rate  = referee.get_shoot_barrel_cooling_value();
+}
+
+
+/**
+ * @brief          snail电机的状态切换
+ */
+void Shoot::snail_mode_sw()
+{
+    static uint8_t power_mode=0 ;
+    static uint16_t pwm_on=fric_sleep;
+    if (referee.robot_status.power_management_shooter_output !=1 && REFREE_USE)
+    {
+        power_mode = 0;
+        shoot_fric_off();
+        /* code */
+    }
+    else
+    {
+        if (power_mode == 0)
+        {
+            shoot_fric1_on(fric_sleep);
+            shoot_fric1_on(fric_sleep);
+            shoot_fric1_on(fric_sleep);
+            vTaskDelay(10);
+            power_mode = 1;
+            /* code */
+        }
+
+
+        if (shoot_mode == SHOOT_STOP)
+        {
+            if(pwm_on > fric_sleep)
+            pwm_on--;
+        }
+        else
+        {
+            if(pwm_on < fric_start)
+            pwm_on ++;
+        }
+        shoot_fric1_on(pwm_on);
+        shoot_fric2_on(pwm_on);
+        shoot_fric3_on(pwm_on);
+    }
+}
+
+void tim_init_shoot()
+{
+    vTaskDelay(100);
+    HAL_TIM_Base_Start(&htim1);
+    HAL_TIM_PWM_Start(&htim1, TIM_CHANNEL_1);
+    HAL_TIM_PWM_Start(&htim1, TIM_CHANNEL_2);
+    HAL_TIM_PWM_Start(&htim1, TIM_CHANNEL_3);
+    HAL_TIM_PWM_Start(&htim1, TIM_CHANNEL_4);
 }

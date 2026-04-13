@@ -329,8 +329,6 @@ typedef __packed struct // 0x0201
 
 }ext_robot_status_t;
 
-
-
 typedef __packed struct // 0x0202
 {
     uint16_t reserved_1; 

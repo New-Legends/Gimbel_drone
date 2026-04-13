@@ -32,6 +32,7 @@
 #include "usart.h"
 #include "usb_device.h"
 #include "gpio.h"
+#include "usb_device.h"
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
@@ -84,14 +85,14 @@ int main(void)
   /* MCU Configuration--------------------------------------------------------*/
 
   /* Reset of all peripherals, Initializes the Flash interface and the Systick. */
-   HAL_Init();
+  HAL_Init();
 
   /* USER CODE BEGIN Init */
 
   /* USER CODE END Init */
 
   /* Configure the system clock */
-  SystemClock_Config(); 
+  SystemClock_Config();
 
   /* USER CODE BEGIN SysInit */
 
@@ -103,7 +104,6 @@ int main(void)
   MX_ADC1_Init();
   MX_ADC3_Init();
   MX_CAN1_Init();
-	
   MX_CAN2_Init();
   MX_I2C1_Init();
   MX_SPI1_Init();
@@ -123,7 +123,7 @@ int main(void)
   MX_USART1_UART_Init();
   MX_USART6_UART_Init();
   /* USER CODE BEGIN 2 */
-
+//  HAL_NVIC_SetPriority(CAN1_RX0_IRQn,3,0);
   /* USER CODE END 2 */
 
   /* Call init function for freertos objects (in freertos.c) */

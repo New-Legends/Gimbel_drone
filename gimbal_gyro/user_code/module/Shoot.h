@@ -114,6 +114,10 @@
 #define TRIGGER_READY_PID_MAX_IOUT 2000.0f
 #define TRIGGER_READY_PID_MAX_OUT 4000.0f
 
+//使用snail2305+c615
+#define REFREE_USE 0
+#define fric_sleep  1100
+#define fric_start  1350
 
 
 
@@ -238,6 +242,8 @@ public:
   void shoot_mode_change();
 
   void get_cooling_ctrl_param(); //获取热量控制相关参数
+
+  void snail_mode_sw(); //snail电机的模式切换
 
 };
 

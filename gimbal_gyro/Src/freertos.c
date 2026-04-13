@@ -121,7 +121,7 @@ void MX_FREERTOS_Init(void) {
 
   /* Create the thread(s) */
   /* definition and creation of test */
-  // osThreadDef(test, test_task, osPriorityRealtime, 0, 128);
+  // osThreadDef(test, test_task, osPriorityNormal, 0, 128);
   // testHandle = osThreadCreate(osThread(test), NULL);
 
   /* USER CODE BEGIN RTOS_THREADS */

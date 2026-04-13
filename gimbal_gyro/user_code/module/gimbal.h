@@ -162,7 +162,7 @@ extern "C"
 
     //GIM电机的中值，因为这个电机0点总是变，并且还没试过给他发设0点函数，上位机设置也不起作用
     #define YAW_MID_GIM     -2.13988686f
-    #define PITCH_MID_GIM   3.29461384f
+    #define PITCH_MID_GIM   4.37876701f
 #endif
 
 

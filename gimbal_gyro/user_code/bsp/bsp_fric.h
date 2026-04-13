@@ -9,4 +9,5 @@
 extern void fric_off(void);
 extern void fric1_on(uint16_t cmd);
 extern void fric2_on(uint16_t cmd);
+extern void fric3_on(uint16_t cmd);
 #endif
