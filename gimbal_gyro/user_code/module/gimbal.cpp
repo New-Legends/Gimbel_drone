@@ -288,6 +288,7 @@ void Gimbal::gimbal_data_update()
 fp32 debug_tp;
 void Gimbal::output()
 {
+    //gimbal_pitch_motor.current_set = 0; //测试重力补偿标定结果
     gimbal_pitch_motor.current_set +=pitch_g_com();
 
 //根据电机正反转,调解电流发送
@@ -1068,5 +1069,5 @@ bool_t gimbal_cmd_to_shoot_stop(void)
 */
 float Gimbal::pitch_g_com()
 {
-    return 1.205*sin(gimbal_pitch_motor.gyro_angle + 2.155);
+    return 5.19*sin(gimbal_pitch_motor.gyro_angle + 0.207);
 }

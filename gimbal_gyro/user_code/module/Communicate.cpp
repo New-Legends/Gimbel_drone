@@ -247,10 +247,10 @@ extern "C"
                 can_receive.get_gimbal_motor_measure(0, rx_data);
                 detect_hook(GIMBAL_YAW_MOTOR_TOE);
                 break;
-            case CAN_YAW_GIMOTOR_ID:
+            case (CAN_YAW_GIMOTOR_ID+CAN_GIM_MOTOR_NUM): //这里实际上会被优化掉
                 can_receive.get_gimbel_gim_measure((CAN_YAW_GIMOTOR_ID-1),rx_data);
                 break;
-            case CAN_PITCH_GIMOTOR_ID:
+            case (CAN_PITCH_GIMOTOR_ID+CAN_GIM_MOTOR_NUM):
                 can_receive.get_gimbel_gim_measure((CAN_PITCH_GIMOTOR_ID-1),rx_data);
                 break;
             default:

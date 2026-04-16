@@ -161,8 +161,8 @@ extern "C"
     #define PITCH_AUTO_PID_MAX_OUT 150.0f
 
     //GIM电机的中值，因为这个电机0点总是变，并且还没试过给他发设0点函数，上位机设置也不起作用
-    #define YAW_MID_GIM     -2.13988686f
-    #define PITCH_MID_GIM   4.37876701f
+    #define YAW_MID_GIM     -5.04520464f
+    #define PITCH_MID_GIM   5.3801403f
 #endif
 
 
